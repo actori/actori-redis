@@ -1,12 +1,12 @@
-# Actix redis [![Build Status](https://travis-ci.org/actix/actix-redis.svg?branch=master)](https://travis-ci.org/actix/actix-redis) [![codecov](https://codecov.io/gh/actix/actix-redis/branch/master/graph/badge.svg)](https://codecov.io/gh/actix/actix-redis) [![crates.io](http://meritbadge.herokuapp.com/actix-redis)](https://crates.io/crates/actix-redis) 
+# Actori redis [![Build Status](https://travis-ci.org/actori/actori-redis.svg?branch=master)](https://travis-ci.org/actori/actori-redis) [![codecov](https://codecov.io/gh/actori/actori-redis/branch/master/graph/badge.svg)](https://codecov.io/gh/actori/actori-redis) [![crates.io](http://meritbadge.herokuapp.com/actori-redis)](https://crates.io/crates/actori-redis) 
 
-Redis integration for actix framework.
+Redis integration for actori framework.
 
 ## Documentation
 
-* [API Documentation](http://actix.github.io/actix-redis/actix_redis/)
-* [Chat on gitter](https://gitter.im/actix/actix)
-* Cargo package: [actix-redis](https://crates.io/crates/actix-redis)
+* [API Documentation](http://actori.github.io/actori-redis/actori_redis/)
+* [Chat on gitter](https://gitter.im/actori/actori)
+* Cargo package: [actori-redis](https://crates.io/crates/actori-redis)
 * Minimum supported Rust version: 1.39 or later
 
 
@@ -23,11 +23,11 @@ Note that whatever you write into your session is visible by the user (but not m
 Constructor panics if key length is less than 32 bytes.
 
 ```rust
-use actix_web::{App, HttpServer, web, middleware};
-use actix_web::middleware::session::SessionStorage;
-use actix_redis::RedisSessionBackend;
+use actori_web::{App, HttpServer, web, middleware};
+use actori_web::middleware::session::SessionStorage;
+use actori_redis::RedisSessionBackend;
 
-#[actix_rt::main]
+#[actori_rt::main]
 async fn main() -> std::io::Result {
     HttpServer::new(|| App::new()
         // enable logger
@@ -56,6 +56,6 @@ at your option.
 
 ## Code of Conduct
 
-Contribution to the actix-redis crate is organized under the terms of the
-Contributor Covenant, the maintainer of actix-redis, @fafhrd91, promises to
+Contribution to the actori-redis crate is organized under the terms of the
+Contributor Covenant, the maintainer of actori-redis, @fafhrd91, promises to
 intervene to uphold that code of conduct.

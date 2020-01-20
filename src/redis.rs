@@ -1,9 +1,9 @@
 use std::collections::VecDeque;
 use std::io;
 
-use actix::actors::resolver::{Connect, Resolver};
-use actix::prelude::*;
-use actix_utils::oneshot;
+use actori::actors::resolver::{Connect, Resolver};
+use actori::prelude::*;
+use actori_utils::oneshot;
 use backoff::backoff::Backoff;
 use backoff::ExponentialBackoff;
 use futures::FutureExt;
@@ -27,7 +27,7 @@ impl Message for Command {
 pub struct RedisActor {
     addr: String,
     backoff: ExponentialBackoff,
-    cell: Option<actix::io::FramedWrite<WriteHalf<TcpStream>, RespCodec>>,
+    cell: Option<actori::io::FramedWrite<WriteHalf<TcpStream>, RespCodec>>,
     queue: VecDeque<oneshot::Sender<Result<RespValue, Error>>>,
 }
 
@@ -63,7 +63,7 @@ impl Actor for RedisActor {
                         let (r, w) = split(stream);
 
                         // configure write side of the connection
-                        let framed = actix::io::FramedWrite::new(w, RespCodec, ctx);
+                        let framed = actori::io::FramedWrite::new(w, RespCodec, ctx);
                         act.cell = Some(framed);
 
                         // read side of the connection
@@ -102,7 +102,7 @@ impl Supervised for RedisActor {
     }
 }
 
-impl actix::io::WriteHandler<io::Error> for RedisActor {
+impl actori::io::WriteHandler<io::Error> for RedisActor {
     fn error(&mut self, err: io::Error, _: &mut Self::Context) -> Running {
         warn!("Redis connection dropped: {} error: {}", self.addr, err);
         Running::Stop

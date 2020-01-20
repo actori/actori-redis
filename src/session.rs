@@ -3,13 +3,13 @@ use std::pin::Pin;
 use std::task::{Context, Poll};
 use std::{collections::HashMap, iter, rc::Rc};
 
-use actix::prelude::*;
-use actix_service::{Service, Transform};
-use actix_session::{Session, SessionStatus};
-use actix_web::cookie::{Cookie, CookieJar, Key, SameSite};
-use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::http::header::{self, HeaderValue};
-use actix_web::{error, Error, HttpMessage};
+use actori::prelude::*;
+use actori_service::{Service, Transform};
+use actori_session::{Session, SessionStatus};
+use actori_web::cookie::{Cookie, CookieJar, Key, SameSite};
+use actori_web::dev::{ServiceRequest, ServiceResponse};
+use actori_web::http::header::{self, HeaderValue};
+use actori_web::{error, Error, HttpMessage};
 use futures::future::{ok, Future, Ready};
 use rand::{distributions::Alphanumeric, rngs::OsRng, Rng};
 use redis_async::resp::RespValue;
@@ -36,7 +36,7 @@ impl RedisSession {
             cache_keygen: Box::new(|key: &str| format!("session:{}", &key)),
             ttl: "7200".to_owned(),
             addr: RedisActor::start(addr),
-            name: "actix-session".to_owned(),
+            name: "actori-session".to_owned(),
             path: "/".to_owned(),
             domain: None,
             secure: false,
@@ -364,8 +364,8 @@ impl Inner {
 #[cfg(test)]
 mod test {
     use super::*;
-    use actix_session::Session;
-    use actix_web::{
+    use actori_session::Session;
+    use actori_web::{
         middleware, test, web,
         web::{get, post, resource},
         App, HttpResponse, Result,
@@ -435,10 +435,10 @@ mod test {
         }
     }
 
-    #[actix_rt::test]
+    #[actori_rt::test]
     async fn test_workflow() {
         // Step 1:  GET index
-        //   - set-cookie actix-session will be in response (session cookie #1)
+        //   - set-cookie actori-session will be in response (session cookie #1)
         //   - response should be: {"counter": 0, "user_id": None}
         // Step 2:  GET index, including session cookie #1 in request
         //   - set-cookie will *not* be in response
@@ -450,7 +450,7 @@ mod test {
         //   - updates session state in redis:  {"counter": 2}
         //   - response should be: {"counter": 2, "user_id": None}
         // Step 5: POST to login, including session cookie #1 in request
-        //   - set-cookie actix-session will be in response  (session cookie #2)
+        //   - set-cookie actori-session will be in response  (session cookie #2)
         //   - updates session state in redis: {"counter": 2, "user_id": "ferris"}
         // Step 6: GET index, including session cookie #2 in request
         //   - response should be: {"counter": 2, "user_id": "ferris"}
@@ -458,13 +458,13 @@ mod test {
         //   - updates session state in redis: {"counter": 3, "user_id": "ferris"}
         //   - response should be: {"counter": 2, "user_id": None}
         // Step 8: GET index, including session cookie #1 in request
-        //   - set-cookie actix-session will be in response (session cookie #3)
+        //   - set-cookie actori-session will be in response (session cookie #3)
         //   - response should be: {"counter": 0, "user_id": None}
         // Step 9: POST to logout, including session cookie #2
-        //   - set-cookie actix-session will be in response with session cookie #2
+        //   - set-cookie actori-session will be in response with session cookie #2
         //     invalidation logic
         // Step 10: GET index, including session cookie #2 in request
-        //   - set-cookie actix-session will be in response (session cookie #3)
+        //   - set-cookie actori-session will be in response (session cookie #3)
         //   - response should be: {"counter": 0, "user_id": None}
 
         let srv = test::start(|| {
@@ -481,7 +481,7 @@ mod test {
         });
 
         // Step 1:  GET index
-        //   - set-cookie actix-session will be in response (session cookie #1)
+        //   - set-cookie actori-session will be in response (session cookie #1)
         //   - response should be: {"counter": 0, "user_id": None}
         let req_1a = srv.get("/").send();
         let mut resp_1 = req_1a.await.unwrap();
@@ -543,7 +543,7 @@ mod test {
         );
 
         // Step 5: POST to login, including session cookie #1 in request
-        //   - set-cookie actix-session will be in response  (session cookie #2)
+        //   - set-cookie actori-session will be in response  (session cookie #2)
         //   - updates session state in redis: {"counter": 2, "user_id": "ferris"}
         let req_5 = srv
             .post("/login")
@@ -599,7 +599,7 @@ mod test {
         );
 
         // Step 8: GET index, including session cookie #1 in request
-        //   - set-cookie actix-session will be in response (session cookie #3)
+        //   - set-cookie actori-session will be in response (session cookie #3)
         //   - response should be: {"counter": 0, "user_id": None}
         let req_8 = srv.get("/").cookie(cookie_1.clone()).send();
         let mut resp_8 = req_8.await.unwrap();
@@ -621,7 +621,7 @@ mod test {
         assert!(cookie_3.value().to_string() != cookie_2.value().to_string());
 
         // Step 9: POST to logout, including session cookie #2
-        //   - set-cookie actix-session will be in response with session cookie #2
+        //   - set-cookie actori-session will be in response with session cookie #2
         //     invalidation logic
         let req_9 = srv.post("/logout").cookie(cookie_2.clone()).send();
         let resp_9 = req_9.await.unwrap();
@@ -635,7 +635,7 @@ mod test {
         assert!(&time::now().tm_year != &cookie_4.expires().map(|t| t.tm_year).unwrap());
 
         // Step 10: GET index, including session cookie #2 in request
-        //   - set-cookie actix-session will be in response (session cookie #3)
+        //   - set-cookie actori-session will be in response (session cookie #3)
         //   - response should be: {"counter": 0, "user_id": None}
         let req_10 = srv.get("/").cookie(cookie_2.clone()).send();
         let mut resp_10 = req_10.await.unwrap();

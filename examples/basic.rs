@@ -1,6 +1,6 @@
-use actix_redis::RedisSession;
-use actix_session::Session;
-use actix_web::{middleware, web, App, Error, HttpRequest, HttpServer, Responder};
+use actori_redis::RedisSession;
+use actori_session::Session;
+use actori_web::{middleware, web, App, Error, HttpRequest, HttpServer, Responder};
 
 /// simple handler
 async fn index(req: HttpRequest, session: Session) -> Result<impl Responder, Error> {
@@ -17,9 +17,9 @@ async fn index(req: HttpRequest, session: Session) -> Result<impl Responder, Err
     Ok("Welcome!")
 }
 
-#[actix_rt::main]
+#[actori_rt::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "actix_web=info,actix_redis=info");
+    std::env::set_var("RUST_LOG", "actori_web=info,actori_redis=info");
     env_logger::init();
 
     HttpServer::new(|| {

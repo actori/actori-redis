@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate redis_async;
 
-use actix_redis::{Command, Error, RedisActor, RespValue};
+use actori_redis::{Command, Error, RedisActor, RespValue};
 
-#[actix_rt::test]
+#[actori_rt::test]
 async fn test_error_connect() {
     let addr = RedisActor::start("localhost:54000");
     let _addr2 = addr.clone();
@@ -15,7 +15,7 @@ async fn test_error_connect() {
     }
 }
 
-#[actix_rt::test]
+#[actori_rt::test]
 async fn test_redis() {
     env_logger::init();
 
